@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invitación a la arena</title>
+<meta name="description" content="Una invitación al cine en pixel art: sábado 21/11, Cinemark Caballito.">
+<meta property="og:title" content="Tenés una invitación a la arena">
+<meta property="og:description" content="Sábado 21/11 · Cinemark Caballito. Abrila, tributo.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 6' shape-rendering='crispEdges'%3E%3Cpath fill='%23ff5c8a' d='M1 0h2v1H1zM4 0h2v1H4zM0 1h7v2H0zM1 3h5v1H1zM2 4h3v1H2zM3 5h1v1H3z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+/*
+VOICE: romántica y épica a la vez, como un juego de 8 bits con corazón.
+IDEA: una transmisión del Capitolio: cosecha, misión, pase y pregunta final.
+PICTURE: escena pixel art nocturna en el bosque, fogata y nosotros dos.
+COLOUR and TYPE: carbón nocturno, brasa naranja, oro; Press Start 2P + VT323.
+LAYOUT: un solo objeto centrado: pantalla arriba, etapa interactiva abajo.
+*/
+:root{color-scheme:dark;--bg:#0c0a12;--panel:#17121c;--line:#3a2a30;--ink:#f4e9dc;--dim:#b9a99a;--ember:#ff6a1a;--gold:#f0b54a;--deep:#2a1418}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:radial-gradient(120% 80% at 50% 0%,#2a1418 0%,var(--bg) 60%);color:var(--ink);font:22px/1.25 "VT323",monospace;min-height:100vh;overflow-x:clip;display:flex;justify-content:center;padding:clamp(12px,3vw,40px) 12px}
+.game{width:100%;max-width:720px;background:var(--panel);border:4px solid var(--line);box-shadow:0 0 0 4px #000,0 0 60px rgba(255,106,26,.18);image-rendering:pixelated}
+.screen{position:relative;border-bottom:4px solid var(--line);background:#000}
+canvas{display:block;width:100%;aspect-ratio:160/96;image-rendering:pixelated;image-rendering:crisp-edges}
+.hud{position:absolute;top:8px;left:10px;right:10px;display:flex;justify-content:space-between;font:9px "Press Start 2P",monospace;color:var(--gold);text-shadow:2px 2px 0 #000;pointer-events:none}
+.stage{display:none;padding:clamp(18px,4vw,32px);animation:in .5s steps(6)}
+.stage.on{display:block}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1,h2{font:clamp(15px,3.4vw,22px)/1.5 "Press Start 2P",monospace;margin:0 0 14px;color:var(--gold);text-wrap:balance;text-shadow:3px 3px 0 var(--deep)}
+p{margin:0 0 14px;color:var(--ink);max-width:60ch}
+.dim{color:var(--dim)}
+.btn{font:12px/1.4 "Press Start 2P",monospace;color:#1a0d06;background:var(--ember);border:0;padding:14px 18px;min-height:48px;cursor:pointer;box-shadow:inset -4px -4px 0 #b13d06,inset 4px 4px 0 #ffa25e,0 4px 0 #000;transition:transform .08s}
+.btn:hover{filter:brightness(1.08)}.btn:active{transform:translateY(3px);box-shadow:inset -4px -4px 0 #b13d06,inset 4px 4px 0 #ffa25e,0 1px 0 #000}
+.btn:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.btn.ghost{background:#2c2228;color:var(--ink);box-shadow:inset -4px -4px 0 #150f13,inset 4px 4px 0 #46363e,0 4px 0 #000}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:18px}
+.paper{display:none;margin:6px 0 16px;background:#efe6d2;color:#2a1a12;padding:18px;border:4px solid #000;box-shadow:6px 6px 0 #000;transform:rotate(-1.5deg);text-align:center}
+.paper.on{display:block;animation:unfold .6s steps(5)}
+@keyframes unfold{from{transform:scaleY(.1) rotate(-1.5deg)}to{transform:scaleY(1) rotate(-1.5deg)}}
+.paper b{display:block;font:clamp(14px,3.6vw,20px)/1.6 "Press Start 2P",monospace;color:#8c1d10;margin:6px 0}
+.facts{display:grid;gap:0;margin:0 0 16px;border-top:3px dashed var(--line)}
+.fact{display:grid;grid-template-columns:9.5em minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:3px dashed var(--line)}
+.fact dt{font:10px/2 "Press Start 2P",monospace;color:var(--ember)}
+.fact dd{margin:0;font-size:24px}
+.fact dd small{display:block;color:var(--dim);font-size:19px}
+.fact a{color:var(--gold)}
+.count{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:6px 0 4px}
+.count div{background:#000;border:3px solid var(--line);padding:10px 4px;text-align:center}
+.count b{display:block;font:clamp(14px,4vw,22px) "Press Start 2P",monospace;color:var(--gold)}
+.count span{font-size:18px;color:var(--dim)}
+.ticket{display:grid;grid-template-columns:minmax(0,1fr) 7.5em;background:var(--gold);color:#2a1408;border:4px solid #000;box-shadow:6px 6px 0 #000;margin:4px 0 8px}
+.ticket .main{padding:16px;border-right:4px dashed #6b3e12}
+.ticket .main i{font:9px "Press Start 2P",monospace;font-style:normal;opacity:.75}
+.ticket .main strong{display:block;font:clamp(11px,2.8vw,15px)/1.6 "Press Start 2P",monospace;margin:6px 0 10px}
+.ticket .stub{display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px;text-align:center;font-size:20px}
+.ticket .stub b{font:18px "Press Start 2P",monospace}
+.ticket dl{display:grid;grid-template-columns:repeat(3,auto);gap:4px 16px;margin:0;justify-content:start}
+.ticket dt{font-size:16px;opacity:.75}.ticket dd{margin:0;font-size:22px}
+.ticket-img{display:block;width:100%;border:4px solid #000;box-shadow:6px 6px 0 #000;margin:4px 0 8px}
+.pass{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center;background:var(--gold);color:#2a1408;border:4px solid #000;box-shadow:6px 6px 0 #000;padding:16px;margin:4px 0 10px}
+.pass img{display:block;width:clamp(170px,40vw,230px);height:auto;background:#fff;border:4px solid #000;image-rendering:pixelated}
+.pass i{font:9px "Press Start 2P",monospace;font-style:normal;opacity:.75}
+.pass strong{display:block;font:clamp(11px,2.6vw,14px)/1.6 "Press Start 2P",monospace;margin:6px 0 8px}
+.pass .code{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px}
+.pass .code b{font:clamp(14px,3.6vw,18px) "Press Start 2P",monospace;letter-spacing:2px;background:#fff;border:3px solid #000;padding:8px 10px}
+.pass .code button{font:9px "Press Start 2P",monospace;background:#2a1408;color:var(--gold);border:0;padding:10px;min-height:40px;cursor:pointer}
+.pass ul{list-style:none;margin:0;padding:0;font-size:21px}.pass li{white-space:nowrap}
+.reset{background:none;border:0;color:var(--dim);font:17px "VT323",monospace;text-decoration:underline;cursor:pointer;margin-top:18px;min-height:44px;padding:0}
+.qrnote{font-size:19px;color:var(--dim);margin:0 0 6px}
+.bottom{margin-top:26px;padding-top:20px;border-top:3px dashed var(--line)}
+.arena{position:relative;min-height:150px;margin-top:8px}
+#no{position:absolute;left:58%;top:20px;transition:left .15s steps(3),top .15s steps(3)}
+#si{position:absolute;left:12%;top:20px}
+.gift{background:#d9dde2;color:#1b1b22;border:4px solid #000;box-shadow:6px 6px 0 #000;padding:16px 18px;margin:8px 0 16px}
+.gift i{font:9px "Press Start 2P",monospace;font-style:normal;color:#5a5f6a}
+.motto{font:10px/1.8 "Press Start 2P",monospace;color:var(--ember);margin-top:16px}
+.dots{display:flex;gap:6px;justify-content:center;padding:0 0 16px}
+.dots i{width:10px;height:10px;background:var(--line)}.dots i.on{background:var(--ember)}
+@media(max-width:600px){.pass{grid-template-columns:minmax(0,1fr);justify-items:center;text-align:center}.pass .code{justify-content:center}body{font-size:20px}.fact{grid-template-columns:minmax(0,1fr);gap:2px}.ticket{grid-template-columns:minmax(0,1fr)}.ticket .main{border-right:0;border-bottom:4px dashed #6b3e12}.ticket .stub{flex-direction:row;gap:12px}#no{left:52%}#si{left:4%}}
+</style>
+</head>
+<body>
+<main class="game">
+  <div class="screen">
+    <canvas id="c" width="160" height="96" aria-label="Escena pixel art: nosotros dos junto a una fogata en el bosque de noche"></canvas>
+    <div class="hud"><span id="hudL">CABALLITO</span><span id="hudR">TRIBUTOS: 2</span></div>
+  </div>
+
+  <section class="stage on" data-s="0">
+    <h1>La cosecha</h1>
+    <p>Este año la urna tiene un solo papel. Y adiviná de quién es.</p>
+    <div class="paper" id="paper"><span>El tributo elegido es</span><b data-k="invitado"></b><span>Te ofreciste sin saberlo. Ya no hay vuelta atrás.</span></div>
+    <div class="row"><button class="btn" id="draw">Sacar el papel</button><button class="btn" id="go1" hidden>Ver mi misión ▶</button></div>
+  </section>
+
+  <section class="stage" data-s="1">
+    <h2>Tu misión</h2>
+    <dl class="facts">
+      <div class="fact"><dt>Película</dt><dd data-k="pelicula"></dd></div>
+      <div class="fact"><dt>Cuándo</dt><dd><span id="fechaTxt"></span><small id="horaTxt"></small></dd></div>
+      <div class="fact"><dt>Punto de partida</dt><dd><span data-k="encuentro"></span><small data-k="encuentroNota"></small></dd></div>
+      <div class="fact"><dt>La arena</dt><dd><span data-k="cine"></span><small><span data-k="direccion"></span> · <a id="mapa" href="#" target="_blank" rel="noopener">Ver ubicación</a></small></dd></div>
+      <div class="fact"><dt>Formato</dt><dd data-k="formato"></dd></div>
+    </dl>
+    <p class="dim" id="countLbl">Pasás a buscarme en</p>
+    <div class="count" id="count"><div><b id="cd">0</b><span>días</span></div><div><b id="ch">0</b><span>horas</span></div><div><b id="cm">0</b><span>min</span></div><div><b id="cs">0</b><span>seg</span></div></div>
+    <div class="row"><button class="btn ghost" data-go="0">◀</button><button class="btn" data-go="2">Ver mi entrada ▶</button></div>
+  </section>
+
+  <section class="stage" data-s="2">
+    <h2>Tu pase a la arena</h2>
+    <div class="passBox"></div>
+    <p class="dim">Este QR es el de verdad: se muestra directo en el ingreso a las salas.</p>
+    <div class="row"><button class="btn ghost" data-go="1">◀</button><button class="btn" data-go="3">Una última pregunta ▶</button></div>
+  </section>
+
+  <section class="stage" data-s="3">
+    <h2>¿Venís conmigo a la arena?</h2>
+    <p id="noMsg" class="dim">Elegí con cuidado, tributo.</p>
+    <div class="arena" id="arena"><button class="btn" id="si">¡Sí, voy!</button><button class="btn ghost" id="no">No</button></div>
+  </section>
+
+  <section class="stage" data-s="4">
+    <h2>¡Alianza sellada!</h2>
+    <p>Mirá para arriba: un patrocinador te mandó un paracaídas.</p>
+    <div class="gift"><i>MENSAJE DEL PATROCINADOR</i><p data-k="mensaje" style="margin:8px 0 0;color:inherit"></p></div>
+    <p>Último paso, tributo: agendalo así no te olvidás de pasar a buscarme.</p>
+    <div class="row"><a class="btn" id="gcal" href="#" target="_blank" rel="noopener" style="text-decoration:none">Agendar en Google Calendar</a><button class="btn ghost" data-go="1">Ver la misión</button></div>
+    <p class="dim" style="margin-top:12px;font-size:19px">Al guardar el evento, Google te va a preguntar si querés mandarme la invitación: decile que sí.</p>
+    <div class="motto">Que la suerte esté siempre de tu lado.</div>
+    <div class="bottom"><h2>Para el sábado</h2><p class="qrnote">Mostrá esto en la entrada de la sala.</p><div class="passBox"></div><button class="reset" id="reset" type="button">Volver a ver la invitación desde el principio</button></div>
+  </section>
+  <div class="dots" id="dots"></div>
+</main>
+
+<script>
+{
+/* ====== DATOS (se reemplazan con tus fotos y tu entrada) ====== */
+const CONFIG = {
+  invitado: "Mi tributo favorito",
+  pelicula: "Los Juegos del Hambre: Amanecer en la cosecha",
+  formato: "2D · subtitulada",
+  funcion: "2026-11-21T23:00:00-03:00",
+  busqueda: "2026-11-21T22:00:00-03:00",
+  fin: "2026-11-22T01:45:00-03:00",
+  encuentro: "Me pasás a buscar por casa",
+  encuentroNota: "a las 22:00 en punto, tributo",
+  cine: "Cinemark Caballito · Sala 2",
+  direccion: "Av. La Plata 96, Caballito",
+  mapa: "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("Cinemark Caballito, Av. La Plata 96, Buenos Aires"),
+  mensaje: "No hace falta ganar los juegos: yo ya gané con que digas que sí.",
+  codigo: "WWR8LJT",
+  mail: "dandelionbrunoruiz@gmail.com",
+  qr: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAArYAAAK2AQAAAACTeOJBAAADIklEQVR42u3dTW7iMBQA4OcJSyS4wVyhNyBHDzfgCnODILEZicizgAIJvyOFEMrnVVPST65xi/Xy/JxyPKM1v+I5jcvlcrlcLpfL5XK5XC6Xy+X+PHed+tDWqRxqHIo+tOlw79u0D60Yrr9fvXDVYP2teuG+hupv0Q83Haq/03644tn9TW/2vCXyd6tuvV5HFDlvd99a5FxfvnnxjW19vnG5XC6Xyx2lO8vttl/fLFOaX1g6dm7OxpfL5XK5XO5buE36bvMHfvpw88T4crlcLpfL5XK5XC6Xy+XebpPHbpvV0ewyIbPx5XK5XC6X+2jbjLK/x+yZur1hI813L6Z02LtxkpS8NR+4XC6Xy+XGO8R3rm9mndXRTLoZOcaXy+VyuVxuPBLfqV7b3wf3ua/nERHFNtQV5nK5XC6XG+dbr4sLz4da99e7Hdu3pCHrzjT3fmb1wG3mA5fL5XK5H7LeqTurmuvrnXvS0HX2ytOiOdX3xT68Mzt0+bRooDo5XC6Xy+V+3nqnirMawVceB7VeaRUZfmVd4VVcLAV4+GprPnC5XC6XG/J/77Zjym8zGUN/Z7uVVjqubyJSxKI66+I++egQ0znL7DEfuFwul8uNz4jvzE6jIMeL64+w4tqhCq87N+pCYlF0fjPzgcvlcrncD3a/zi+KuHhu1LpzdEKTUnpJfvWlVp0vwerDdTWKfCMul8vlcrkvcZfpYovz+Mi6s/6ZjfyczJX5wOVyuVxuyN9p58PErSydZXlykTpl/3aZM6Mah9J84HK5XC6Xe/9c8EXOfzohnf1+pzGfz9A6/2JqPnC5XC6XG+I7D7UUkSOWZaxTe4tTkcc4Do35wOVyuVzuT3OXKf0+hFp252QWOf/dhWvKiPUhdlOOdRzEYbhcLpfLDXGYuBZQiYhFjohoJid1aPapNXmfV9wuV2N8uVwul8vlvuG54MfWWuKcHqJpfLlcLpfL5Y7TffBc8P9tb3MueDnQ+7bpaVyHmmdNP9xmsL+LshduNVh/V71O3+f3d9Pr9H1+f5tep6//vz43uVwul8vlcrlcLpfL5XK53B/n/gO8G8rlJ/WfYgAAAABJRU5ErkJggg=="
+};
+
+const $ = s => document.querySelector(s);
+document.querySelectorAll('[data-k]').forEach(el => el.textContent = CONFIG[el.dataset.k]);
+const fn = new Date(CONFIG.funcion), pick = new Date(CONFIG.busqueda), end = new Date(CONFIG.fin);
+const hm = d => d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',hourCycle:'h23',timeZone:'America/Argentina/Buenos_Aires'});
+$('#fechaTxt').textContent = fn.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',timeZone:'America/Argentina/Buenos_Aires'});
+$('#horaTxt').textContent = 'función de las ' + hm(fn) + ' h';
+$('#mapa').href = CONFIG.mapa;
+const pass = `<div class="pass"><img src="${CONFIG.qr}" alt="Código QR de la entrada" width="230" height="230">
+  <div><i>ADMITE DOS TRIBUTOS</i><strong>${CONFIG.pelicula}</strong>
+  <ul><li>Sábado 21/11 · ${hm(fn)}</li><li>${CONFIG.cine}</li><li>${CONFIG.formato.split(' · ').slice(0,2).join(' · ')}</li></ul>
+  <div class="code"><span>Código de retiro</span><b>${CONFIG.codigo}</b><button type="button" class="copy">Copiar</button></div></div></div>`;
+document.querySelectorAll('.passBox').forEach(el => el.innerHTML = pass);
+document.querySelectorAll('.copy').forEach(b => b.addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(CONFIG.codigo); b.textContent = '¡Copiado!'; } catch(e) { b.textContent = CONFIG.codigo; }
+  setTimeout(() => b.textContent = 'Copiar', 2000);
+}));
+const z = d => d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
+$('#gcal').href = 'https://calendar.google.com/calendar/render?' + new URLSearchParams({
+  action: 'TEMPLATE',
+  text: 'Cine: ' + CONFIG.pelicula,
+  dates: z(pick) + '/' + z(end),
+  ctz: 'America/Argentina/Buenos_Aires',
+  location: 'Cinemark Caballito, Av. La Plata 96, Buenos Aires',
+  details: '22:00 · Pasar a buscarla por su casa.\n23:00 · Función en Cinemark Caballito, Sala 2 (2D subtitulada).\nCódigo de retiro: ' + CONFIG.codigo + '\n\nQue la suerte esté siempre de nuestro lado.',
+  add: CONFIG.mail
+}).toString().replace('%2F','/');
+
+/* ====== ETAPAS ====== */
+let stage = 0, accepted = false, paperT = -1;
+const stages = [...document.querySelectorAll('.stage')];
+const hudR = ['TRIBUTOS: ?','TRIBUTOS: 2','PASE: OK','DECISIÓN','ALIANZA ♥'];
+$('#dots').innerHTML = stages.map(() => '<i></i>').join('');
+function go(n){
+  stage = n;
+  stages.forEach((s,i) => s.classList.toggle('on', i === n));
+  [...$('#dots').children].forEach((d,i) => d.classList.toggle('on', i <= n));
+  $('#hudR').textContent = hudR[n];
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => go(+b.dataset.go)));
+$('#draw').addEventListener('click', () => {
+  $('#paper').classList.add('on'); $('#draw').hidden = true; $('#go1').hidden = false; paperT = 0;
+});
+$('#go1').addEventListener('click', () => go(1));
+let saved = false; try{ saved = localStorage.getItem('arena-si') === '1'; }catch(e){}
+if (saved){ accepted = true; chuteY = 40; go(4); } else go(0);
+
+/* botón "No" que escapa */
+const noMsgs = ['¿Seguro? Pensalo otra vez.','Los vigilantes no aprueban esa respuesta.','Esquivaste la flecha… pero no esta pregunta.','En esta arena el "no" no existe.','Ya está, rendite: decí que sí.'];
+let tries = 0;
+function flee(e){
+  e.preventDefault();
+  const a = $('#arena').getBoundingClientRect(), b = $('#no').getBoundingClientRect();
+  $('#no').style.left = Math.random() * Math.max(0, a.width - b.width) + 'px';
+  $('#no').style.top = Math.random() * Math.max(0, a.height - b.height) + 'px';
+  $('#noMsg').textContent = noMsgs[Math.min(tries++, noMsgs.length - 1)];
+  if (tries > 5) $('#no').textContent = 'Bueno, sí';
+}
+$('#no').addEventListener('pointerenter', flee);
+$('#no').addEventListener('pointerdown', flee);
+$('#no').addEventListener('click', e => { if (tries > 5) yes(); else flee(e); });
+function yes(){ accepted = true; chuteY = -30; try{ localStorage.setItem('arena-si','1'); }catch(e){} go(4); }
+$('#si').addEventListener('click', yes);
+$('#reset').addEventListener('click', () => {
+  try{ localStorage.removeItem('arena-si'); }catch(e){}
+  accepted = false; tries = 0; paperT = -1;
+  $('#paper').classList.remove('on'); $('#draw').hidden = false; $('#go1').hidden = true;
+  $('#no').textContent = 'No'; $('#no').style.left = ''; $('#no').style.top = ''; $('#noMsg').textContent = 'Elegí con cuidado, tributo.';
+  go(0);
+});
+
+/* cuenta regresiva */
+function tick(){
+  let d = Math.max(0, pick - Date.now()) / 1000;
+  if (d === 0) $('#countLbl').textContent = '¡Los juegos ya empezaron!';
+  const v = [Math.floor(d/86400), Math.floor(d%86400/3600), Math.floor(d%3600/60), Math.floor(d%60)];
+  ['#cd','#ch','#cm','#cs'].forEach((id,i) => $(id).textContent = String(v[i]).padStart(2,'0'));
+}
+tick(); setInterval(tick, 1000);
+
+/* ====== PIXEL ART ====== */
+const cv = $('#c'), g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
+const W = 160, H = 96;
+const ELLA = ["......wwww......",".yy..wWwwWw..yy.","yyoy.wwwwww.yoyy",".yyhhwwwwwwhhyy.","..hhhhhhhhhhhh..",".hhhhhhhhhhhhhh.","hhhhhhhhhhhhhhhh","hhhhhhhhhhhhhhhh","hhhsssssssssshhh","hhkkkkkkkkkkkkhh","hhksweksskweskhh","hhkseeksskeeskhh","hhkkkkksskkkkkhh","hhrrssssnsssrrhh","hhhssssmmsssshhh","hhhhsssssssshhhh","hhhhhhsssshhhhhh","hhsLLDLLLDLLDshh","hhvLDLLDLLDLLihh","...pppppppppp...","...ppp....ppp...","...bbb....bbb..."];
+const EL = [".y.y........y.y.",".yyy........yyy.",".yyyy......yyyy.","..yy.hhhhhh.yy..","...hhhhhhhhhh...","..hhggghhhhhhh..",".hhhggghhhhhhhh.",".hhhhhhhhhhhhhh.",".hhsssssssssshh.",".hssssssssssssh.",".sshhsssssshhss.",".sswessssssweSs.".replace('S','s'),".sseessssssees s.".replace(' ',''),".srrssttttssrrs.","..ssssmmmmssss..","...ssssssssss...","......ssss......","..sTTTTvvTTTTs..","..sTTTTTTTTTTs..","...TTTTTTTTTT...","...pppppppppp...","...ppp....ppp...","...bbb....bbb..."];
+const LENTES = ["yyyyyyyyyyyyyy","yyWyWyyyyyWyWy","yyyWyy..yyyWyy"];
+const BLINK_ELLA = [[4,11,2],[10,11,2]], BLINK_EL = [[3,12,2],[11,12,2]];
+const PAL_ELLA = {o:"#ff9a2a",w:"#ffffff",e:"#2a1a22",h:"#120f16",s:"#f3d2bd",k:"#7a5868",l:"#cfe8ff",n:"#d8dce2",r:"#f2a3a3",m:"#d9707a",v:"#cfd3d8",K:"#000",L:"#c98a3c",D:"#3a2414",i:"#4a4452",y:"#ffd23a",w:"#b0835a",W:"#6e4a2e",p:"#2b2b3a",b:"#1c1820"};
+const PAL_EL = {w:"#ffffff",e:"#2a1a12",r:"#f08a7a",h:"#16120f",g:"#9d9aa3",s:"#d6a27c",S:"#b98563",m:"#8a3a34",t:"#fbf6ea",v:"#cfd3d8",T:"#15131a",U:"#24212b",y:"#ffd23a",p:"#2a2a33",b:"#101014"};
+const HEART = [".rr.rr.","rrrrrrr","rrrrrrr",".rrrrr.","..rrr..","...r..."];
+function sprite(rows, x, y, pal, blink, k = 1){
+  rows.forEach((r,j) => [...r].forEach((ch,i) => {
+    let col = pal[ch] || (ch === 'e' ? '#1a1010' : ch === 'r' ? '#f09a9a' : null);
+    if (blink && (ch === 'e' || ch === 'w')) col = pal.s;
+    if (ch !== '.' && col){ g.fillStyle = col; g.fillRect(x+i*k, y+j*k, k, k); }
+  }));
+  if (blink){ g.fillStyle = '#2a1a1a'; blink.forEach(([bx,by,bw]) => g.fillRect(x+bx*k, y+by*k, bw*k, k)); }
+}
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const stars = Array.from({length:40}, () => [rnd()*W|0, rnd()*48|0, rnd()*6]);
+const backTrees = Array.from({length:14}, (_,i) => [i*12 + (rnd()*6|0), 18 + (rnd()*10|0)]);
+const frontTrees = [[6,34],[20,28],[140,32],[154,38],[124,24]];
+let embers = [], chuteY = -30;
+const reduce = false; let last = performance.now(), dt = 1;
+function pine(x, base, h, col){
+  g.fillStyle = col;
+  for (let i = 0; i < h; i++){ const w = Math.floor(i/2.2) + 1; g.fillRect(x-w, base-h+i, w*2+1, 1); }
+  g.fillRect(x, base, 1, 3);
+}
+function disc(cx, cy, r, col){ g.fillStyle = col; for (let y=-r; y<=r; y++){ const w = Math.floor(Math.sqrt(r*r-y*y)); g.fillRect(cx-w, cy+y, w*2+1, 1); } }
+function frame(){
+  const ms = performance.now(); dt = Math.min(4, (ms - last) / 16.7); last = ms;
+  const t = ms / 1000;
+  const sky = ['#0b0916','#110c1e','#171024','#1e1228','#26152b','#30182c'];
+  sky.forEach((c,i) => { g.fillStyle = c; g.fillRect(0, i*14, W, 14); });
+  stars.forEach(([x,y,p]) => { if (Math.sin(t*2+p) > -.3){ g.fillStyle = '#e8dccb'; g.fillRect(x,y,1,1); } });
+  disc(30, 16, 7, '#f3e7c4'); g.fillStyle='#d9cba4'; g.fillRect(27,14,2,2); g.fillRect(32,19,2,1);
+  backTrees.forEach(([x,h]) => pine(x, 74, h, '#1d1426'));
+  g.fillStyle = '#1a120f'; g.fillRect(0, 76, W, 20);
+  g.fillStyle = '#2a1c14'; g.fillRect(0, 76, W, 1);
+  frontTrees.forEach(([x,h]) => pine(x, 80, h, '#0e0a10'));
+  // brillo de la fogata
+  const fl = Math.sin(t*9)*.04 + Math.sin(t*23)*.03;
+  const grd = g.createRadialGradient(80,78,2,80,78,46);
+  grd.addColorStop(0, `rgba(255,120,30,${.35+fl})`); grd.addColorStop(1, 'rgba(255,120,30,0)');
+  g.fillStyle = grd; g.fillRect(0,30,W,66);
+  if (stage === 0){
+    // urna de la cosecha
+    g.fillStyle = '#3a2a20'; g.fillRect(70,80,21,4);
+    g.fillStyle = 'rgba(170,210,240,.35)'; for (let y=0; y<14; y++){ const w = 10 - Math.floor((y*y)/26); g.fillRect(80-w, 66+y, w*2+1, 1); }
+    g.fillStyle = 'rgba(220,240,255,.8)'; g.fillRect(70,65,21,1);
+    g.fillStyle = '#efe6d2'; [[74,74],[78,72],[83,75],[86,73],[76,77],[81,77]].forEach(([x,y]) => g.fillRect(x,y,3,2));
+    if (paperT >= 0){ paperT += dt/60; const py = 66 - Math.min(paperT,1)*28; g.fillStyle = '#efe6d2'; g.fillRect(77, py, 7, 4); g.fillStyle = '#8c1d10'; g.fillRect(78, py+1, 5, 1); }
+  } else {
+    // fogata
+    g.fillStyle = '#5a3420'; g.fillRect(73,81,15,2); g.fillStyle = '#3e2416'; g.fillRect(75,79,11,2);
+    const fh = [6,9,12,10,7], cols = ['#ff3b0f','#ff8a1a','#ffd24a'];
+    fh.forEach((h,i) => { const hh = h + Math.round(Math.sin(t*12 + i*1.7)*2); cols.forEach((c,k) => { g.fillStyle = c; g.fillRect(76+i*2, 79-hh+k*3, 2, Math.max(1, hh-k*3)); }); });
+    const bob = Math.round(Math.sin(t*3));
+    const near = accepted ? 3 : 0;
+    const yA = 44 + (bob > 0 ? -1 : 0), yB = 42 + (bob < 0 ? -1 : 0);
+    const bA = (t % 3.2) < .14, bB = ((t + 1.3) % 3.7) < .14;
+    sprite(ELLA, 36+near, yA, PAL_ELLA, bA ? BLINK_ELLA : null, 2);
+    sprite(EL, 92-near, yB, PAL_EL, bB && !accepted ? BLINK_EL : null, 2);
+    if (accepted) sprite(LENTES, 94-near, yB+20, {y:'rgba(255,196,40,.9)',W:'#fff'}, null, 2);
+    g.font = '5px monospace';
+    if (accepted){
+      if (Math.floor(t*2) % 2 === 0) sprite(HEART, 74, 36, {r:'#ff5c8a'}, null, 2);
+      // paracaídas del patrocinador
+      if (chuteY < 40) chuteY += .25*dt;
+      const cx = 120 + Math.round(Math.sin(t*1.5)*3), cy = Math.min(chuteY, 40);
+      g.fillStyle = '#c9ced6'; for (let y=0; y<6; y++){ const w = Math.floor(Math.sqrt(36-(6-y)**2)) + 1; g.fillRect(cx-w, cy+y, w*2+1, 1); }
+      g.fillStyle = '#8d939e'; g.fillRect(cx-6, cy+6, 13, 1);
+      g.fillStyle = '#b8bec8'; for (let k=1; k<6; k++){ g.fillRect(cx-6+k, cy+6+k, 1, 1); g.fillRect(cx+6-k, cy+6+k, 1, 1); }
+      g.fillStyle = '#9aa1ad'; g.fillRect(cx-2, cy+12, 5, 4); g.fillStyle = '#ff6a1a'; g.fillRect(cx, cy+12, 1, 4);
+    }
+  }
+  // brasas
+  if (true){
+    if (stage > 0 && Math.random() < .35*dt) embers.push({x:78+Math.random()*6, y:72, v:.2+Math.random()*.4, d:Math.random()*6});
+    embers = embers.filter(e => (e.y -= e.v*dt) > 20);
+    embers.forEach(e => { g.fillStyle = e.y > 50 ? '#ffb347' : '#ff5a1a'; g.fillRect(Math.round(e.x + Math.sin(e.y/6 + e.d)*2), Math.round(e.y), 1, 1); });
+  }
+}
+// bucle con temporizador: sigue andando aunque el visor frene requestAnimationFrame
+setInterval(frame, 33);
+frame();
+}
+</script>
+</body>
+</html>
