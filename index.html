@@ -128,10 +128,11 @@ p{margin:0 0 14px;color:var(--ink);max-width:60ch}
     <p>Mirá para arriba: un patrocinador te mandó un paracaídas.</p>
     <div class="gift"><i>MENSAJE DEL PATROCINADOR</i><p data-k="mensaje" style="margin:8px 0 0;color:inherit"></p></div>
     <p>Último paso, tributo: agendalo así no te olvidás de pasar a buscarme.</p>
-    <div class="row"><a class="btn" id="gcal" href="#" target="_blank" rel="noopener" style="text-decoration:none">Agendar en Google Calendar</a><button class="btn ghost" data-go="1">Ver la misión</button></div>
-    <p class="dim" style="margin-top:12px;font-size:19px">Al guardar el evento, Google te va a preguntar si querés mandarme la invitación: decile que sí.</p>
+    <div class="row"><a class="btn" id="gcal" href="#" rel="noopener" style="text-decoration:none">Agendar en Google Calendar</a><a class="btn ghost" id="ics" href="#" download="cita-cine.ics" style="text-decoration:none">Otro calendario (.ics)</a></div>
+    <p class="dim" style="margin-top:12px;font-size:19px">Al guardar el evento, Google te va a preguntar si querés mandarme la invitación: decile que sí. Si el link no abre (pasa a veces dentro de WhatsApp o Instagram), abrí esta página en Chrome o Safari, o usá el botón .ics.</p>
+    <div class="row"><button class="btn ghost" data-go="1">Ver la misión</button></div>
     <div class="motto">Que la suerte esté siempre de tu lado.</div>
-    <div class="bottom"><h2>Para el sábado</h2><p class="qrnote">Mostrá esto en la entrada de la sala.</p><div class="passBox"></div><button class="reset" id="reset" type="button">Volver a ver la invitación desde el principio</button></div>
+    <div class="bottom"><h2>Para el sábado</h2><p class="qrnote">Mostrá esto en la entrada de la sala.</p><div class="passBox"></div><button class="reset" id="reset" type="button">Volver a empezar la invitación</button></div>
   </section>
   <div class="dots" id="dots"></div>
 </main>
@@ -183,6 +184,13 @@ $('#gcal').href = 'https://calendar.google.com/calendar/render?' + new URLSearch
   details: '22:00 · Pasar a buscarla por su casa.\n23:00 · Función en Cinemark Caballito, Sala 2 (2D subtitulada).\nCódigo de retiro: ' + CONFIG.codigo + '\n\nQue la suerte esté siempre de nuestro lado.',
   add: CONFIG.mail
 }).toString().replace('%2F','/');
+const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//invitacion-cine//ES','BEGIN:VEVENT',
+  'UID:cine-' + CONFIG.codigo + '@invitacion','DTSTAMP:' + z(new Date()),'DTSTART:' + z(pick),'DTEND:' + z(end),
+  'SUMMARY:Cine: ' + CONFIG.pelicula,'LOCATION:Cinemark Caballito\\, Av. La Plata 96\\, Buenos Aires',
+  'DESCRIPTION:22:00 pasar a buscarla por su casa.\\n23:00 función\\, Sala 2 (2D subtitulada).\\nCódigo de retiro: ' + CONFIG.codigo,
+  'ATTENDEE;CN=Dandelion:mailto:' + CONFIG.mail,
+  'BEGIN:VALARM','TRIGGER:-PT1H','ACTION:DISPLAY','DESCRIPTION:Pasar a buscarla','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+$('#ics').href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
 
 /* ====== ETAPAS ====== */
 let stage = 0, accepted = false, paperT = -1;
@@ -201,8 +209,7 @@ $('#draw').addEventListener('click', () => {
   $('#paper').classList.add('on'); $('#draw').hidden = true; $('#go1').hidden = false; paperT = 0;
 });
 $('#go1').addEventListener('click', () => go(1));
-let saved = false; try{ saved = localStorage.getItem('arena-si') === '1'; }catch(e){}
-if (saved){ accepted = true; chuteY = 40; go(4); } else go(0);
+go(0);
 
 /* botón "No" que escapa */
 const noMsgs = ['¿Seguro? Pensalo otra vez.','Los vigilantes no aprueban esa respuesta.','Esquivaste la flecha… pero no esta pregunta.','En esta arena el "no" no existe.','Ya está, rendite: decí que sí.'];
@@ -218,10 +225,9 @@ function flee(e){
 $('#no').addEventListener('pointerenter', flee);
 $('#no').addEventListener('pointerdown', flee);
 $('#no').addEventListener('click', e => { if (tries > 5) yes(); else flee(e); });
-function yes(){ accepted = true; chuteY = -30; try{ localStorage.setItem('arena-si','1'); }catch(e){} go(4); }
+function yes(){ accepted = true; chuteY = -30; go(4); }
 $('#si').addEventListener('click', yes);
 $('#reset').addEventListener('click', () => {
-  try{ localStorage.removeItem('arena-si'); }catch(e){}
   accepted = false; tries = 0; paperT = -1;
   $('#paper').classList.remove('on'); $('#draw').hidden = false; $('#go1').hidden = true;
   $('#no').textContent = 'No'; $('#no').style.left = ''; $('#no').style.top = ''; $('#noMsg').textContent = 'Elegí con cuidado, tributo.';
